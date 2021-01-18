@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JS Drum Kit</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="keys">
+      <div data-key="65" class="key">
+        <kbd>A</kbd>
+        <span class="sound">clap</span>
+      </div>
+      <div data-key="83" class="key">
+        <kbd>S</kbd>
+        <span class="sound">hihat</span>
+      </div>
+      <div data-key="68" class="key">
+        <kbd>D</kbd>
+        <span class="sound">kick</span>
+      </div>
+      <div data-key="70" class="key">
+        <kbd>F</kbd>
+        <span class="sound">openhat</span>
+      </div>
+      <div data-key="71" class="key">
+        <kbd>G</kbd>
+        <span class="sound">boom</span>
+      </div>
+      <div data-key="72" class="key">
+        <kbd>H</kbd>
+        <span class="sound">ride</span>
+      </div>
+      <div data-key="74" class="key">
+        <kbd>J</kbd>
+        <span class="sound">snare</span>
+      </div>
+      <div data-key="75" class="key">
+        <kbd>K</kbd>
+        <span class="sound">tom</span>
+      </div>
+      <div data-key="76" class="key">
+        <kbd>L</kbd>
+        <span class="sound">tink</span>
+      </div>
+    </div>
+
+    <audio data-key="65" src="sounds/clap.wav"></audio>
+    <audio data-key="83" src="sounds/hihat.wav"></audio>
+    <audio data-key="68" src="sounds/kick.wav"></audio>
+    <audio data-key="70" src="sounds/openhat.wav"></audio>
+    <audio data-key="71" src="sounds/boom.wav"></audio>
+    <audio data-key="72" src="sounds/ride.wav"></audio>
+    <audio data-key="74" src="sounds/snare.wav"></audio>
+    <audio data-key="75" src="sounds/tom.wav"></audio>
+    <audio data-key="76" src="sounds/tink.wav"></audio>
+
+    <script>
+      function playSound(e) {
+        //e je event objekat, koji u sebi sadrzi keyCode properti koji nam treba za keydown event koji ima proprti keyCode(koji je broj)
+        const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`); //koristimo atribut selektor da ne bi svim audio elementima dodavali class, ES6 template backticks pa varijabla unutar e event objekta
+        const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+        if (!audio) return; // ako ne postoji audio element povezan sa pritisnutim key-em, ne izvrsavaj f-ju
+        audio.currentTime = 0; //da ne bi bilo pauze izmedju zvuka kada pritisnemo vise puta zaredom isti key, da ne ceka da se izvrsi play do kraja vec premota na pocetak
+        audio.play();
+        key.classList.add("playing"); //dodajemo klasu playing
+      }
+
+      //slusamo kada kada se zavrsi tansition event, tj. kada se desi transitionend event
+      const keys = document.querySelectorAll(".key"); //vraca Node List pa ne mozemo da slusamo na svim elementima, mora (forEach) proci kroz sve i attach-ovati event listener na svaki
+      keys.forEach((key) =>
+        key.addEventListener("transitionend", removeTransition)
+      ); //slusamo transitionend i kada se zavrsi, izvrsava se f-ja removeTransition
+      function removeTransition(e) {
+        if (e.propertyName !== "transform") return; //preskoci ako nije properti event objekta, propertyName = transform
+        this.classList.remove("playing"); //this je key, addEventListener na sta smo pozvali
+      }
+
+      window.addEventListener("keydown", playSound);
+    </script>
+  </body>
+</html>
